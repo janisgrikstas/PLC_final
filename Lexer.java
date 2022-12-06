@@ -229,33 +229,11 @@ public class Lexer {
 				lexError(word);
 				break;
 			}
-            
-            
+      		}
             }
-            
-            // If the word matches any of the keywords, create a Keyword token
-            //else if (Arrays.asList(keywords).contains(word)) {
-            	//lexies.add(new Token("real_lit", 1));
-            //}
-        	// If the word matches any of the special symbols, create a SpecialSymbol token
-           // else if (Arrays.asList(specialSymbols).contains(word)) {
-            	//lexies.add(new SpecialSymbol(word));
-            //} 
-    		// If the word does not match any of the above patterns, it is assumed to be a variable or function identifier
-            //else {
-            	//lexies.add(new Identifier(word));
-            //}
-        }
-
-
-    return lexies;
+        return lexies;
+    
     }
-    
-    
+
 }
-
-
-
-
-
         
