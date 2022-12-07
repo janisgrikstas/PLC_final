@@ -186,7 +186,55 @@ M_bool_f(<fbool_actor>, s) == switch (<factor>)
 		- <bool_lit>.expected = <char_lit>.value | <nat_lit>.value
 
 
-10)
+10) 
+	-int varone = 456 * "hello" ;
+	//varone would then equal "456456"
+ 	
+	-int varone ;
+	varone = true ; 
+	//varone would pass as being assigned a bool
+	
+	- int varone = 5 ;
+	  int vartwo = varone / 0 ;
+	//would fail at the assignment of vartwo, since it's dividing by zero
+	
+
 
 11)
+	a) {2 * ( b - 1 ) - 1 > 0} -> {b > 3/2}
+	
+	b)
+	x = x + 1 {x<0} 
+	0 > x + 1
+	-1 > x 
+	x = 3x {x<0}
+	0 > 3x
+	weakest precondition: {0 > x}
+	
+	c){0 > 2a(b-1)}
+	
+	d)
+	2 * a - 1 > 6 -> {a>3}
+	3 * ( 2 * b + a ) > 3
+	6b + 3a > 3
+	2b + 1 > 1
+	weakest precondition: {b > (1 - a)/2}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
