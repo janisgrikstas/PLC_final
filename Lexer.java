@@ -171,11 +171,11 @@ public class Lexer {
 				lexies.add(new Token(">", 25));
 			}
 			//less than or equal to bool operator
-            else if(word.equals("<=")) {
+            else if(word.equals("<<=")) {
 				lexies.add(new Token("<=", 26));
 			}
 			//greater than or equal to bool operator
-            else if(word.equals(">=")) {
+            else if(word.equals(">>=")) {
 				lexies.add(new Token(">=", 27));
 			}
 			//equal to bool operator

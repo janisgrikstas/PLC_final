@@ -1,0 +1,242 @@
+
+
+
+identifier -> [A-Za-z][A-Za-z][A-Za-z][A-Za-z][A-Za-z][A-Za-z][A-Za-z]?[A-Za-z]?
+operator -> /^(\+|-|\*|\/|=|\/||\%|\^|)$/
+bool_operator (&& | || | === | < | > | <<= | >>= | != )
+real_lit ->"[+-]?\\d+\\.\\d+"
+natural_lit -> "[+-]?\\d+"
+bool_lit -> “true” | “false”
+char_lit -> "'(\\\\[\\s\\S]|[^'])'"
+string_lit -> "\"(\\\\[\\s\\S]|[^\"])*\""
+symbol -> (\( | \) | \{ | \} | \\n | ; | ,)
+key word -> `while` while loop  
+key word -> `begin`
+key word -> `end` program ender
+key word -> `if` switch
+key word -> `else` else
+declaration_keywords -> (`int` | `String` | `double` | `boolean` | `char`)
+<program> -> begin<stmt_list>
+<stmt_list< -> <stmt> ; | <stmt> ; <stmt_list>
+<stmt> —> <var_declaration> | <func_declaration> | <assignment> | <expression> | <while_loop> | <switch> | <block>
+<block> -> `{` <stmt> `}`
+<while_loop> -> `while(` <and> `)` <block> 
+<switch> -> `if (` <and> `)` <block> [`else` <block>]
+<expression> -> <term> (`*`| `/` | `%` ) <term> | <term>
+<term> -> <factor> (`+`| `-`) <factor> | <factor>
+<factor> -> identifier |`natural_lit`|`bool_lit` |`char_lit` | `string_lit` | `real_lit`| (<expression>) 
+<var_declaration> -> declaration_keyword identifier  `;`
+<assignment> -> identifier `=` <expression> `;`
+<func_declaration> -> `function` identifier `(` <parameter> `)` <block>
+<and> -> <or> `and` <or> | <or>
+<or> -> <check_if_equal>  `or` <check_if_equal> | <check_if_equals>
+<check_if_equal> -> <check_value> (`!=`|`===`) <check_value> | <check_value>
+<check_value> -> <boolean_expression> (`<<=`|`>>=`|`<`|`>`) <boolean_expression> | <boolean_expression>
+<boolean_expression> -> <boolean_term> (`*`|`/`|`%`) <boolean_term> | 
+<boolean_term> -> <boolean_factor> (`+`|`-`) <boolean_factor> | <boolean_factor>
+<boolean_factor>-> identifier |`natural_lit`|`bool_lit` |`char_lit` | `string_lit` | `real_lit`
+
+
+1)token.java
+
+2)compiler.java
+
+3)lexer.java
+
+4)parser.java
+
+<switch> -> `if (` <and> `)` <block> [`else` <block>]
+5)
+M_s(if(<and>) <block>[1] else <block>[2], s)
+		if M_b(<and>, s) == error
+		return error
+		if M_b(<and>, s)
+			return M_block(<block>[1], s)
+		else return M_block(<block>[2], s)
+
+6)
+M_while (while (<and>) <block> =, s)
+		if M_b(<and>, s) == error
+		return error
+		if M_b(<and>, s)
+			if M_b(<stmt>, s) ==error
+				error
+			else s = M_s(<block>, s)
+			M_while(while (<and>) <block> =, s)		
+		else
+		return s
+7)
+M_e (<expression>, s) == switch(<expression>)
+	case <term>[1] *  <term>[2]:
+		if M_e(<expression>.term[1], s) == error || M_e(<expression>.term[2], s) == error 
+		return error
+		if(M_t(<term[1]>).type != M_t(<term[2]>).type)
+		return error		
+		else return M_t(<term[1]>, s) * M_t (<term[2]>, s)
+	case <term>[1] /  <term>[2]:
+		if M_e(<expression>.term[1], s) == error || M_e(<expression>.term[2], s) == error 
+		return error
+		if(M_t(<term[1]>).type != M_t(<term[2]>).type)
+		return error		
+		else return M_t(<term[1]>, s) / M_t (<term[2]>, s)
+	case <term>[1] %  <term>[2]:
+		if M_e(<expression>.term[1], s) == error || M_e(<expression>.term[2], s) == error 
+		return error
+		if(M_t(<term[1]>).type != M_t(<term[2]>).type)
+		return error		
+		else return M_t(<term[1]>, s) * M_t (<term[2]>, s)
+M_t (<term> ,s )==switch(<term>)
+	case <factor>[1] +  <factor>[2]:
+		if M_t(<term>.factor[1], s) == error || M_t(<term>.factor[2], s) == error 
+		return error
+		if(M_t(<factor[1]>).type != M_t(<factor>[2]>).type)
+		return error
+		else return M_f (<factor[1]>, s) + M_f (<factor[2]>, s)
+	case <factor>[1] -  <factor>[2]:
+		if M_t(<term>.factor[1], s) == error || M_t(<term>.factor[2], s) == error 
+		return error
+		if(M_f(<factor[1]>).type != M_f(<factor[2]>).type)
+		return error
+		else return M_f (<factor[1]>, s) - M_f (<factor[2]>, s)
+M_f(<factor>, s) == switch (<factor>)
+	case <var> if VARMAP(<var>, s)==undefined
+		then error
+		else return VARMAP (<var>, s)
+	case <nat_lit>
+		return <nat_lit>.value
+	case <real_lit>
+		return <real_lit>.value
+
+8)M_bool_e (<bool_expression>, s) == switch(<bool_expression>)
+	case <boolterm>[1] *  <boolterm>[2]:
+		if M_bool_e(<bool_expression>.term[1], s) == error || M_e(<bool_expression>.term[2], s) == error 
+		return error		
+		else return M_bool_t(<bool_term[1]>, s) * M_bool_t (<bool_term[2]>, s)
+	case <boolterm>[1] /  <boolterm>[2]:
+		if M_bool_e(<bool_expression>.term[1], s) == error || M_e(<bool_expression>.term[2], s) == error 
+		return error		
+		else return M_bool_t(<bool_term[1]>, s) / M_bool_t (<bool_term[2]>, s)
+	case <boolterm>[1] %  <boolterm>[2]:
+		if M_bool_e(<bool_expression>.term[1], s) == error || M_e(<bool_expression>.term[2], s) == error 
+		return error		
+		else return M_bool_t(<bool_term[1]>, s) % M_bool_t (<bool_term[2]>, s)
+	case <boolterm>
+		if M_bool_e(<bool_expression>.term, s) == error  
+		return error		
+		else return M_bool_t(<bool_term>, s)
+M_bool_t (<bool_term> ,s )==switch(<term>)
+	case <bool_factor>[1] +  <bool_factor>[2]:
+		if M_bool_t(<term>.factor[1], s) == error || M_bool_t(<term>.factor[2], s) == error 
+		return error
+		if(M_bool_t(<factor[1]>).type != M_bool_t(<factor>[2]>).type)
+		return error
+		else return M_bool_f (<bool_factor[1]>, s) + M_bool_f (<bool_factor[2]>, s)
+	case <bool_factor>[1] -  <factor>[2]:
+		if M_bool_t(<term>.factor[1], s) == error || M_bool_t(<term>.factor[2], s) == error 
+		return error
+		if(M_bool_t(<factor[1]>).type != M_bool_t(<factor>[2]>).type)
+		return error
+		else return M_bool_f (<bool_factor[1]>, s) - M_bool_f (<bool_factor[2]>, s)
+	case <bool_factor>
+		return M_bool_f(<bool_factor>, s)
+M_bool_f(<fbool_actor>, s) == switch (<factor>)
+	return s
+
+
+
+
+9)	<assignment> -> id = <expression>
+		if <expression>.type == char_lit) then id.expected == char_lit or nat_lit
+		if <expression>.type == string_lit then id.expected == string_lit
+		if <expression>.type == nat_lit then id.expected == bool_lit or char_lit or real_lit or nat_lit
+		if <expression>.type == bool_lit then id.expected nat_lit or bool_lit
+		if <expression>.type == real_lit then id.expected == real_lit
+	<expression> -> <term>[1] + <term>[2]
+		if(lookup(term[1]).type == string_lit && lookup(term[2]) == string_lit )
+				<expression> ==  “<term>[1].value <term>[2].value”
+					
+	<expression> -> <term> - <term>
+	<expression> -> <term>
+	<term> -> <factor> * <factor>
+		PREDICATE if(lookup(factor[1]).type == string_lit && lookup(factor[2]) == nat_lit )
+				<term> == <factor>[1].value <factor>[1].value
+	<term> -> <factor> / <factor>
+		PREDICATE: <factor> <> 0
+	<term> -> <factor> % <factor>
+		PREDICATE: <factor> <> 0
+	<term> -> <factor>
+	<factor> -> ( <expression> )
+	<factor> -> int_lit
+	<factor> -> id
+	<factor> -> <expression>
+
+	this is what i first did and idk if it’s worse or better?
+	
+	<assign> -> <identifier> `=` <expression> `;`
+		- <expression>.expected <- <identifier>.actual
+	<expression.expected> -> <term>[1] (`*`| `/` | `%` ) <term>[2] | <term>[3]
+		if( term[1].actual_type == string_lit && (`*`) && term[2].actual_type == nat_lit)
+			then 	<nat_lit>[1].value <nat_lit>[1].value
+		else if( <expression> -> <term>[1] (`/`)|| (`%`) <term>[2] PREDICATE term[2] <> 0
+	<term> -> <factor>[1] (`+`| `-`) <factor>[2] | <factor>[3] 
+		if(factor[1].actual_type ==string_lit && (`+`) && factor[2].actual_type == string_lit)
+			then 	term.value -> <factor>[1].value <factor>[2].value	
+	<factor> -> identifier |`natural_lit`|`bool_lit` |`char_lit` | `string_lit` | `real_lit`| (<expression>)
+		- <identifier>.expected = <string_lit>.value
+		- <nat_lit>.expected = <nat_lit>.value | <bool_lit>.value | <char_lit>.value
+		- <real_lit>.expected = <real_lit>.value | <nat_lit>.value
+		- <bool_lit>.expected = <char_lit>.value | <nat_lit>.value
+
+
+10) 
+	-int varone = 456 * "hello" ;
+	//varone would then equal "456456"
+ 	
+	-int varone ;
+	varone = true ; 
+	//varone would pass as being assigned a bool
+	
+	- int varone = 5 ;
+	  int vartwo = varone / 0 ;
+	//would fail at the assignment of vartwo, since it's dividing by zero
+	
+
+
+11)
+	a) {2 * ( b - 1 ) - 1 > 0} -> {b > 3/2}
+	
+	b)
+	x = x + 1 {x<0} 
+	0 > x + 1
+	-1 > x 
+	x = 3x {x<0}
+	0 > 3x
+	weakest precondition: {0 > x}
+	
+	c){0 > 2a(b-1)}
+	
+	d)
+	2 * a - 1 > 6 -> {a>3}
+	3 * ( 2 * b + a ) > 3
+	6b + 3a > 3
+	2b + 1 > 1
+	weakest precondition: {b > (1 - a)/2}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
